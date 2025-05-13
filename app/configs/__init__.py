@@ -1,0 +1,1 @@
+#all app configurations are here
