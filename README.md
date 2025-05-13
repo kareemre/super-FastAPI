@@ -72,6 +72,12 @@ This Paragraph is from Martin Fowler's famous Book "Patterns of Enterprise Appli
 # Request Life Cycle
 
 The main entry point is app/main.py,  
+Please run: 
+```bash
+fastapi dev app/main.py
+```
+            
+
 
 ## TODO 
 - Implementing Repository pattern with strategy design pattern for database operations.
