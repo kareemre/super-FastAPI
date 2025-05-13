@@ -1,2 +1,4 @@
 fast-cache/
 .env
+__pycache__/
+*.py[cod]
