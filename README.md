@@ -2,7 +2,7 @@
 
 In routes directory you will find a module named `routes_registry.py` that can be used for registering application routes.
 
-`__init__.py` : We Register our application routes in __all__ variable list.
+`__init__.py` : We Register our application routes in `__all__` variable list.
 
 Example: 
 
@@ -61,7 +61,7 @@ And in .env file you can set your database credentials and use it in configs/dat
 
 # Models 
 
-This structure relies on SQLModel ORM. All models are defined in `models` package. Please note that every new defined model should be registered in `models/__init__.py` file in __all__ variable list. This is necessary for creating DB tables in database/sql_connection.py
+This structure relies on SQLModel ORM. All models are defined in `models` package. Please note that every new defined model should be registered in `models/__init__.py` file in `__all__` variable list. This is necessary for creating DB tables in database/sql_connection.py
 
 # Repositories 
 
