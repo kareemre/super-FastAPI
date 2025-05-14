@@ -34,13 +34,16 @@ def register_routes(app: "FastAPI", prefix: str | None = None) -> None:
     import importlib
     
     for module_name in __all__:
-        module = importlib.import_module(f"app.routers.{module_name}")
+        try:
+            module = importlib.import_module(f"app.routers.{module_name}")
         
-        if hasattr(module, "router"):
-            if prefix:
-                app.include_router(module.router, prefix=prefix)
-            else:
-                app.include_router(module.router)
+            if hasattr(module, "router"):
+                if prefix:
+                    app.include_router(module.router, prefix=prefix)
+                else:
+                    app.include_router(module.router)
+        except ImportError as e:
+            print(f"Error importing module {module_name}: {e}")
 ```
 
 
