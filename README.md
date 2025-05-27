@@ -59,7 +59,7 @@ adhering to FastAPI and Pydantic Json Serialization, filtering and validation ru
 
 # Database
 The default database is PostgreSQL, with asyncpg to utilize the async feature of sqlalchemy,
-And in .env file you can set your database credentials and use it in configs/database.py module. This module handles database/connection.py to  yielding a asyncsession (Assuming application used ORM is SqlAlchemy; as sqlmodels still does not have the clear functionality utilizing the async behaviour of sqlalchemy).
+And in .env file you can set your database credentials and use it in configs/database.py module. This module handles database/connection.py to  yielding a asyncsession (Assuming application used ORM is SqlAlchemy; as sqlmodel still does not have the clear functionality utilizing the async behaviour of sqlalchemy).
 
 
 # Models 
