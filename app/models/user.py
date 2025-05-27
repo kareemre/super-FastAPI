@@ -1,65 +1,72 @@
-# here is a user.py model using SQLModel, defining all users' database operations here following active record pattern
-#for shared heavy queries we will use the repository package 
+from app.models.base import (
+    Base, Optional, List, datetime, TYPE_CHECKING, 
+    Mapped, mapped_column, ForeignKey, Integer, String, DateTime, relationship
+)
+from sqlalchemy import select
 
-from app.models.base import SQLModel, Field, Relationship, Optional, List, datetime, TYPE_CHECKING
-from sqlmodel import Session, select
+if TYPE_CHECKING:
+    from app.models.order import Order  
 
-
-
-class User(SQLModel, table=True):
+class User(Base):
     __tablename__ = "users"
+
+    id: Mapped[Optional[int]] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String)
+    email: Mapped[str] = mapped_column(String, unique=True)
+    password: Mapped[str] = mapped_column(String)
+    phone: Mapped[str] = mapped_column(String)
+    address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+    orders: Mapped[List["Order"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+
+    @classmethod
+    async def get_user_by_email(cls, session, email: str):
+        
+        stmt = select(cls).where(cls.email == email)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    @classmethod
+    async def email_exists(cls, session, email: str) -> bool:
+        user = await cls.get_user_by_email(session, email)
+        return user is not None
     
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str
-    email: str
-    password: str
-    phone: str
-    address: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
-    
-   
     
     @classmethod
-    def get_user_by_email(cls, session: Session, email: str):
+    async def create_user(cls, session, **kwargs) -> "User":
         """
-        Get a user by email.
+        Create a new user and save to database.
         
         Args:
-            email (str): The email of the user to retrieve.
-        
+            session: Async database session
+            **kwargs: User data fields
+            
         Returns:
-            User: The user with the specified email.
+            Created user instance
         """
-        return session.exec(
-            select(cls).where(cls.email == email)
-        ).first()
+        user = cls(**kwargs)
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+        return user
     
-    @classmethod
-    def email_exists(cls, session: Session, email: str) -> bool:
+    async def save(self, session) -> "User":
         """
-        Check if a user with the specified email exists.
+        Save the current user instance to database.
         
         Args:
-            email (str): The email to check.
-        
+            session: Async database session
+            
         Returns:
-            bool: True if the email exists, False otherwise.
-        """
-        return cls.get_user_by_email(session, email) is not None
-    
-    def save(self, session: Session):
-        """
-        Save the user to the database.
-        
-        Args:
-            session (Session): The SQLModel session to use.
-        
-        :Returns:
-            User: The saved user instance.
+            The saved user instance
         """
         session.add(self)
-        session.commit()
-        session.refresh(self)
-        
+        await session.commit()
+        await session.refresh(self)
         return self
+    
+    
+    def __repr__(self) -> str:
+        return f"<User(id={self.id}, email='{self.email}', name='{self.name}')>"

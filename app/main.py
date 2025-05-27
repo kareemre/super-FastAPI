@@ -1,20 +1,26 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from contextlib import asynccontextmanager
+from app.database.connection.connection import sessionmanager
 
-from app.database.connection.sql_connection import create_db_and_tables
 from app.routers.routes_registry import register_routes
 from app.routers.api_response.custom_api_response import custom_validation_exception_handler
 
 app = FastAPI(debug=True)
 
 
-@app.on_event("startup")
-async def on_startup():
-    """Create database tables on startup."""
-    
-    create_db_and_tables()
-    print("Database tables created!")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Function that handles startup and shutdown events.
+    To understand more, read https://fastapi.tiangolo.com/advanced/events/
+    """
+    yield
+    if sessionmanager._engine is not None:
+        # Close the DB connection
+        await sessionmanager.close()
 
+#register application routes
 register_routes(app, prefix="/api/v1")
 
 @app.exception_handler(RequestValidationError)

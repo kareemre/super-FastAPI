@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
-from sqlmodel import Session
-from app.dependencies.db_session_dependency import get_session
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.dependencies.db_session_dependency import get_db_session
 from app.models.user import User
 from passlib.context import CryptContext
 from app.routers.api_response.custom_api_response import CustomApiSuccessResponse
@@ -34,7 +35,7 @@ class UserIn(BaseUser):
 
 
 @router.post("/register", response_model=BaseUser, response_class=CustomApiSuccessResponse, status_code=201)
-async def create_user(user: UserIn, session: Session = Depends(get_session)) -> BaseUser:
+async def create_user(user: UserIn, session: AsyncSession = Depends(get_db_session)) -> BaseUser:
     """
     Create a new user.
     
@@ -45,7 +46,7 @@ async def create_user(user: UserIn, session: Session = Depends(get_session)) -> 
         BaseUser: The created user data.
     """
     
-    if User.email_exists(session, user.email):
+    if await User.email_exists(session, user.email):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     
@@ -61,7 +62,7 @@ async def create_user(user: UserIn, session: Session = Depends(get_session)) -> 
     )
     
     
-    new_user.save(session)
+    await new_user.save(session)
     
     return user
 

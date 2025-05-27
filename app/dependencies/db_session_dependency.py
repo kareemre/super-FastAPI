@@ -1,12 +1,19 @@
-from sqlmodel import Session
-from app.database.connection.sql_connection import engine
+from typing import AsyncGenerator
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-def get_session():
+from app.database.connection.connection import sessionmanager
+
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """
-    Create and yield a SQLModel Session.
+    Database session dependency with auto-commit on success.
     
-    This function is designed to be used as a FastAPI dependency.
-    The session is automatically closed after the request is processed.
+    Automatically commits the transaction if no exceptions occur.
+    Use this when you want automatic transaction management.
     """
-    with Session(engine) as session:
-        yield session
+    async with sessionmanager.session() as session:
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
