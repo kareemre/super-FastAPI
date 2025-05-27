@@ -58,13 +58,13 @@ adhering to FastAPI and Pydantic Json Serialization, filtering and validation ru
 
 
 # Database
-The default database is PostgreSQL,
-And in .env file you can set your database credentials and use it in configs/database.py module. This module handles database/sql_connection.py to connect and create DB tables and yielding a session (Assuming application used ORM is SQLModel which relies on SQLAlchemy).
+The default database is PostgreSQL, with asyncpg to utilize the async feature of sqlalchemy,
+And in .env file you can set your database credentials and use it in configs/database.py module. This module handles database/connection.py to  yielding a asyncsession (Assuming application used ORM is SqlAlchemy; as sqlmodels still does not have the clear functionality utilizing the async behaviour of sqlalchemy).
 
 
 # Models 
 
-This structure relies on SQLModel ORM. All models are defined in `models` package. Please note that every new defined model should be registered in `models/__init__.py` file in `__all__` variable list. This is necessary for creating DB tables in database/sql_connection.py
+This structure relies on sqlalchemy ORM. All models are defined in `models` package. Please note that every new defined model should be registered in `models/__init__.py` file in `__all__` variable list. This is necessary for creating DB tables in database/connection.py
 
 # Repositories 
 
