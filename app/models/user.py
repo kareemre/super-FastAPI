@@ -4,8 +4,7 @@ from app.models.base import (
 )
 from sqlalchemy import select
 
-if TYPE_CHECKING:
-    from app.models.order import Order  
+ 
 
 class User(Base):
     __tablename__ = "users"
@@ -19,7 +18,6 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
-    orders: Mapped[List["Order"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     @classmethod
     async def get_user_by_email(cls, session, email: str):
